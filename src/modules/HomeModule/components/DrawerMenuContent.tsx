@@ -5,9 +5,14 @@ import { Separator } from "@/components/ui/Separator";
 import { SheetHeader, SheetTitle } from "@/components/ui/Sheet";
 import { ResultCategory } from "@/services/category/categoryTypes";
 import { GET_ALL_VALUE } from "@/shared/constants/defaultConsts";
+import { USER_VARIABLE } from "@/shared/constants/localStorageVariables";
+import { ALLOW_ROLES_TO_CREATE } from "@/shared/constants/roles";
+import useDialogModal from "@/shared/hooks/useDialogModal";
 import useSheet from "@/shared/hooks/useSheet";
+import { getLocalStorage } from "@/shared/utils/localStorageUtils";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 import React from "react";
+import { CreateTopicForm } from "./CreateTopicForm";
 
 interface SheetMenuChildProps extends React.HTMLAttributes<HTMLDivElement> {
   isLoading: boolean;
@@ -17,8 +22,14 @@ interface SheetMenuChildProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const DrawerMenuContent = (props: SheetMenuChildProps) => {
+  const { setDialogModal } = useDialogModal();
   const { isLoading, list, currentValue, navigateToSection } = props;
   const { setOpenSheet } = useSheet();
+  const userData = getLocalStorage(USER_VARIABLE);
+
+  const handleValidateUser = () => {
+    return ALLOW_ROLES_TO_CREATE.includes(userData?.role);
+  };
 
   const handleOnClickAllProducts = () => {
     navigateToSection(GET_ALL_VALUE);
@@ -31,6 +42,13 @@ export const DrawerMenuContent = (props: SheetMenuChildProps) => {
     navigateToSection(value);
     setOpenSheet((prev) => {
       return { ...prev, anchor: "" };
+    });
+  };
+
+  const openDialogToCreateTopin = () => {
+    if(!handleValidateUser()) return
+    setDialogModal((prev) => {
+      return { ...prev, state: true, children: <CreateTopicForm categoryList={list} />  };
     });
   };
 
@@ -61,10 +79,12 @@ export const DrawerMenuContent = (props: SheetMenuChildProps) => {
           </Button>
         ))}
       </div>
-      <Button className="absolute bottom-0 w-full">
-        <PlusCircledIcon className="mr-2 h-4 w-4" />
-        Crear una temática
-      </Button>
+      {handleValidateUser() && (
+        <Button className="absolute bottom-0 w-full" onClick={() => openDialogToCreateTopin()}>
+          <PlusCircledIcon className="mr-2 h-4 w-4" />
+          Crear una temática
+        </Button>
+      )}
     </div>
   );
 };

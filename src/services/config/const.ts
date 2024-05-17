@@ -4,7 +4,7 @@ export const HEADERS_APPLICATION_JSON = {
 
 export const HEADERS_MULTIPART = {
   "content-type": "multipart/form-data",
-  accept: "*",
+  accept: "*/*",
 };
 
 export const HEADER_FORM_DATA = {

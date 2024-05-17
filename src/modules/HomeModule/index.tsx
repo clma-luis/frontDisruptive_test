@@ -21,6 +21,9 @@ import { INTERNAL_SERVER_ERROR_STATUS, errorMessages, genericErrorMessage } from
 import { CategoriesResponseService, ResultCategory } from "@/services/category/categoryTypes";
 import useDialogModal from "@/shared/hooks/useDialogModal";
 import { CreateTopicForm } from "./components/CreateTopicForm";
+import { getLocalStorage } from "@/shared/utils/localStorageUtils";
+import { USER_VARIABLE } from "@/shared/constants/localStorageVariables";
+import { ALLOW_ROLES_TO_CREATE } from "@/shared/constants/roles";
 
 const HomeModule = () => {
   const { setDialogModal } = useDialogModal();
@@ -32,6 +35,7 @@ const HomeModule = () => {
   const [isLoading, setisLoading] = useState(false);
   const [list, setList] = useState<ResultCategory[] | []>([]);
   const { handleErrorAlert } = useHandleError();
+  const userData = getLocalStorage(USER_VARIABLE);
 
   useEffect(() => {
     handleSearchProduct();
@@ -40,6 +44,10 @@ const HomeModule = () => {
   useEffect(() => {
     getAllCategoriesService();
   }, []);
+
+  const handleValidateUser = () => {
+    return ALLOW_ROLES_TO_CREATE.includes(userData?.role);
+  };
 
   const handleSearchProduct = () => {
     const currentInputValue = debouncedSearchTerm;
@@ -86,10 +94,11 @@ const HomeModule = () => {
   };
 
   const openDialogToCreateTopin = () => {
+    if(!handleValidateUser()) return
     setDialogModal((prev) => {
-      return { ...prev, state: true, children: <CreateTopicForm categoryList={list}/> };
+      return { ...prev, state: true, children: <CreateTopicForm categoryList={list} />  };
     });
-  }
+  };
 
   return (
     <div
@@ -135,12 +144,14 @@ const HomeModule = () => {
                     </div>
                   </div>
 
-                  <div className="hidden lg:flex px-4 w-full  justify-center lg:justify-end mt-4 lg:mt-0 ml-auto ">
-                    <Button onClick={() => openDialogToCreateTopin()}>
-                      <PlusCircledIcon className="mr-2 h-4 w-4" />
-                      Crear una temática
-                    </Button>
-                  </div>
+                  {handleValidateUser() && (
+                    <div className="hidden lg:flex px-4 w-full  justify-center lg:justify-end mt-4 lg:mt-0 ml-auto ">
+                      <Button onClick={() => openDialogToCreateTopin()}>
+                        <PlusCircledIcon className="mr-2 h-4 w-4" />
+                        Crear una temática
+                      </Button>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <div className="w-full flex justify-start p-4">

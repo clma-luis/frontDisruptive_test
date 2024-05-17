@@ -1,24 +1,23 @@
-import { Pagination } from "@/shared/interfaces/general";
-import { connection } from "../config/connection";
-import { TOPIC_PATHS_SERVICE } from "./topicPaths";
 import { GET_ALL_VALUE } from "@/shared/constants/defaultConsts";
 import { ErrorResponse } from "@/shared/interfaces";
+import { Pagination } from "@/shared/interfaces/general";
+import { connection } from "../config/connection";
+import { HEADERS_MULTIPART } from "../config/const";
+import { TOPIC_PATHS_SERVICE } from "./topicPaths";
 import { OneTopicResponseService, TopicResponseService } from "./topicTypes";
 
 const API = connection();
 
-const {
-  GET_ALL_TOPICS_PATH,
-  GET_ONE_TOPIC_PATH,
-  GET_ALL_TOPICS_BY_CATEGORY_ID_PATH,
-  REMOVE_ONE_TOPIC_PATH,
-  UPDATE_CATEGORIES_IN_TOPIC_PATH,
-  UPDATE_TOPIC_PATH,
-} = TOPIC_PATHS_SERVICE;
+const { CREATE_TOPIC_PATH, GET_ALL_TOPICS_PATH, GET_ONE_TOPIC_PATH, GET_ALL_TOPICS_BY_CATEGORY_ID_PATH } = TOPIC_PATHS_SERVICE;
 
 export interface TopicPagination extends Pagination {
   category?: string;
 }
+
+export const createTopic = async (body: FormData): Promise<OneTopicResponseService | ErrorResponse> => {
+  const response = await API.post(CREATE_TOPIC_PATH, body);
+  return response;
+};
 
 export const getOneTopic = async (id: string): Promise<OneTopicResponseService | ErrorResponse> => {
   const response = await API.get(GET_ONE_TOPIC_PATH.replace(":id", id));
