@@ -28,8 +28,7 @@ interface CreateTopicFormProps {
 export function CreateTopicForm(props: CreateTopicFormProps) {
   const { categoryList } = props;
   const [form, setForm] = React.useState(initialForm);
-
-  console.log({form})
+  console.log({ form });
 
   const handleOnchange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -37,10 +36,18 @@ export function CreateTopicForm(props: CreateTopicFormProps) {
   };
 
   const hadleSelectValue = (e: string) => {
-    setForm({ ...form, categories: `${form.categories}, ${e}` });
+    setForm({ ...form, categories: `${form.categories.replaceAll(`${e},`, "")}, ${e}` });
   };
 
-  const currentCategories = form.categories.split(" ,")
+  const adapterCategories = () => {
+    const categories = categoryList.filter((item) => form.categories.includes(item.id));
+    return categories;
+  };
+
+  const handleDeleteCategory = (e: string) => {
+    const newCategories = form.categories.replaceAll(`${e}, `, "").replace(e, "");
+    setForm({ ...form, categories: newCategories });
+  };
 
   return (
     <Card className="w-full mt-6 border-none">
@@ -49,40 +56,63 @@ export function CreateTopicForm(props: CreateTopicFormProps) {
         <CardDescription>Es tu momento de ser un pro!</CardDescription>
       </CardHeader>
       <CardContent>
-        <form>
-          <div className="grid w-full items-center gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="name">Titulo</Label>
-              <Input name="title" id="name" placeholder="Titulo de la tematica" onChange={handleOnchange} />
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="framework">Categorias</Label>
-              <Select onValueChange={(e) => hadleSelectValue(e)}>
-                <SelectTrigger id="framework">
-                  <SelectValue placeholder="Selecciona una opcion" />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  {categoryList.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                  
-                  {currentCategories.map((item)=> (
-                    <div key={item}>{item}</div>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <input type="file" accept="image/*" onChange={() => {}} />
-              <button onClick={() => {}}>Subir imagen</button>
-            </div>
+        <div className="grid w-full items-center gap-4">
+          <div className="flex flex-col space-y-1.5">
+            <Label htmlFor="name">Titulo</Label>
+            <Input name="title" id="name" placeholder="Titulo de la tematica" onChange={handleOnchange} />
           </div>
-        </form>
+          <div className="flex flex-col space-y-1.5">
+            <Label htmlFor="framework">Categorias</Label>
+            <Select onValueChange={(e) => hadleSelectValue(e)}>
+              <SelectTrigger id="framework">
+                <SelectValue placeholder="Selecciona una opcion" />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                {categoryList.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {adapterCategories().map((item) => (
+              <div key={item.id}>
+                {item.name !== "videoYoutube" ? (
+                  <div className="flex flex-col space-y-1.5 ">
+                    <Label htmlFor="framework">{item.name}</Label>
+                    <div className="flex w-full items-center mt-2 mb-2">
+                      <Input
+                        name={item.name}
+                        placeholder={`Ingresa un ${item.name}`}
+                        type="file"
+                        accept={item.name === "image" ? "image/*" : "application/pdf"}
+                        onChange={handleOnchange}
+                      />
+                      <Button className="ml-1" variant="outline" onClick={() => handleDeleteCategory(item.id)}>
+                        Eliminar
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col space-y-1.5">
+                    <Label htmlFor="framework">{item.name}</Label>
+                    <div className="flex w-full items-center mt-2 mb-2">
+                      <Input name={item.name} placeholder={`Ingresa un ${item.name}`} onChange={handleOnchange} />{" "}
+                      <Button className="ml-1" variant="outline" onClick={() => handleDeleteCategory(item.id)}>
+                        Eliminar
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Button variant="outline">Cancel</Button>
-        <Button>Deploy</Button>
+        <Button variant="outline">Cancelar</Button>
+        <Button>Aceptar</Button>
       </CardFooter>
     </Card>
   );
