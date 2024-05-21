@@ -9,7 +9,7 @@ Para instalar este proyecto, asegúrate de tener Node.js instalado en tu sistema
 
 1. Clona el repositorio desde: 
 ```bash
-https://github.com/clma-luis/delosi_prueba_tecnica
+
 ```
 
 2. En la terminal, navega hasta el directorio del proyecto.
