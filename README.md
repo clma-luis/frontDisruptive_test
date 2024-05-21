@@ -9,7 +9,7 @@ Para instalar este proyecto, asegúrate de tener Node.js instalado en tu sistema
 
 1. Clona el repositorio desde: 
 ```bash
-
+https://github.com/clma-luis/frontDisruptive_test.git
 ```
 
 2. En la terminal, navega hasta el directorio del proyecto.
